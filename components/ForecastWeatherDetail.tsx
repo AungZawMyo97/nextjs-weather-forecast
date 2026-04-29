@@ -22,7 +22,7 @@ export default function ForecastWeatherDetail(
       {/* Left Section */}
       <section className="flex gap-4 items-center px-4">
         <div className="flex flex-col items-center gap-1">
-          <WeatherIcon iconName={props.weatherIcon} />
+          <WeatherIcon iconname={props.weatherIcon} />
           <p>{props.date}</p>
           <p className="text-sm">{props.day}</p>
         </div>

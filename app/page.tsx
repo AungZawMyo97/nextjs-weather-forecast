@@ -178,7 +178,7 @@ export default function Home() {
                       {format(parseISO(d.dt_txt), "h:mm a")}
                     </p>
                     <WeatherIcon
-                      iconName={getDayOrNightIcon(d.weather[0].icon, d.dt_txt)}
+                      iconname={getDayOrNightIcon(d.weather[0].icon, d.dt_txt)}
                     />
                     <p>{d?.main.temp ? `${Math.round(d.main.temp)}°C` : "0"}</p>
                   </div>
@@ -193,7 +193,7 @@ export default function Home() {
                 {firstData?.weather[0].description}
               </p>
               <WeatherIcon
-                iconName={getDayOrNightIcon(
+                iconname={getDayOrNightIcon(
                   firstData?.weather[0].icon ?? "",
                   firstData?.dt_txt ?? "",
                 )}

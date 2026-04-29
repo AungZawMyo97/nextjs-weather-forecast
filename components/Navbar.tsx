@@ -8,6 +8,7 @@ import SearchBox from "./SearchBox";
 import axios from "axios";
 import { placeAtom } from "@/app/atom";
 import { useAtom } from "jotai";
+import { WeatherItem } from "@/models/SearchBoxModel";
 
 type Props = { location?: string };
 
@@ -29,7 +30,10 @@ export default function Navbar({ location }: Props) {
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/find?q=${value}&appid=${API_KEY}`,
         );
-        const suggestions = response.data.list.map((item: any) => item.name);
+        console.log("suggestions", response.data);
+        const suggestions = response.data.list.map(
+          (item: WeatherItem) => item.name,
+        );
         setSuggestions(suggestions);
         setError("");
         setShowSuggestions(true);
@@ -46,7 +50,7 @@ export default function Navbar({ location }: Props) {
     setShowSuggestions(false);
   }
 
-  function handleSubmitSearch(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmitSearch(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     // Handle search submission logic here
     if (suggestions.length === 0) {
@@ -62,7 +66,7 @@ export default function Navbar({ location }: Props) {
     <nav className="shadow-sm sticky top-0 left-0 z-50 bg-white">
       <div className="h-20 w-full flex justify-between items-center max-w-7xl px-3 mx-auto">
         <p className="flex items-center justify-center gap-2">
-          <h2 className="text-gray-500 text-3xl">Weather</h2>
+          <span className="text-gray-500 text-3xl">Weather</span>
           <MdWbSunny className="text-3xl mt-1 text-yellow-300" />
         </p>
 
@@ -74,7 +78,7 @@ export default function Navbar({ location }: Props) {
           <div className="relative">
             <SearchBox
               value={city}
-              onSubmit={(e) => handleSubmitSearch(e)}
+              onSubmit={handleSubmitSearch}
               onChange={(e) => handleInputChange(e.target.value)}
             />
             <SuggestionBox
