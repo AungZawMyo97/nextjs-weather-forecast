@@ -6,7 +6,7 @@ import { MdMyLocation } from "react-icons/md";
 import { MdOutlineLocationOn } from "react-icons/md";
 import SearchBox from "./SearchBox";
 import axios from "axios";
-import { placeAtom } from "@/app/atom";
+import { coordAtom, loadingCityAtom, placeAtom } from "@/app/atom";
 import { useAtom } from "jotai";
 import { WeatherItem } from "@/models/SearchBoxModel";
 
@@ -20,7 +20,9 @@ export default function Navbar({ location }: Props) {
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [place, setPlace] = useAtom(placeAtom);
+  const [, setPlace] = useAtom(placeAtom);
+  const [, setCoords] = useAtom(coordAtom);
+  const [, setLoadingCity] = useAtom(loadingCityAtom);
 
   async function handleInputChange(value: string) {
     setCity(value);
@@ -37,7 +39,7 @@ export default function Navbar({ location }: Props) {
         setSuggestions(suggestions);
         setError("");
         setShowSuggestions(true);
-      } catch (error) {
+      } catch {
         setError("Error fetching suggestions");
         setSuggestions([]);
         setShowSuggestions(false);
@@ -52,14 +54,44 @@ export default function Navbar({ location }: Props) {
 
   function handleSubmitSearch(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Handle search submission logic here
     if (suggestions.length === 0) {
       setError("Please select a city from the suggestions.");
+      setLoadingCity(false);
     } else {
+      setLoadingCity(true);
       setError("");
-      setPlace(city);
-      setShowSuggestions(false);
+      setTimeout(() => {
+        setCoords(null);
+        setPlace(city);
+        setShowSuggestions(false);
+        setLoadingCity(false);
+      }, 500);
     }
+  }
+
+  function handleUseCurrentLocation() {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported in this browser.");
+      return;
+    }
+
+    setError("");
+    setLoadingCity(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        setCoords({ lat: latitude, lon: longitude });
+        setShowSuggestions(false);
+        setLoadingCity(false);
+      },
+      () => {
+        setError("Unable to get your location. Please allow location access.");
+        setLoadingCity(false);
+      },
+    );
   }
 
   return (
@@ -71,7 +103,10 @@ export default function Navbar({ location }: Props) {
         </p>
 
         <section className="flex gap-2 items-center">
-          <MdMyLocation className="text-2xl text-gray-400 hover:opacity-80 cursor-pointer" />
+          <MdMyLocation
+            className="text-2xl text-gray-400 hover:opacity-80 cursor-pointer"
+            onClick={handleUseCurrentLocation}
+          />
           <MdOutlineLocationOn className="text-3xl" />
           <p className="text-slate-900/80 text-sm">{location}</p>
 
@@ -131,3 +166,4 @@ function SuggestionBox({
     </>
   );
 }
+

@@ -11,9 +11,9 @@ import WeatherDetails from "@/components/WeatherDetails";
 import { metersToKilometers } from "@/utils/metersToKilometers";
 import { convertWindSpeed } from "@/utils/convertWindSpeed";
 import ForecastWeatherDetail from "@/components/ForecastWeatherDetail";
-import { placeAtom } from "./atom";
+import WeatherSkeleton from "@/components/WeatherSkeleton";
+import { coordAtom, loadingCityAtom, placeAtom } from "./atom";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
 
 export interface WeatherForecastResponse {
   cod: string;
@@ -92,23 +92,23 @@ export interface Coord {
 }
 
 export default function Home() {
-  const [place, setPlace] = useAtom(placeAtom);
+  const [place] = useAtom(placeAtom);
+  const [coords] = useAtom(coordAtom);
+  const [loadingCity] = useAtom(loadingCityAtom);
 
-  const { isPending, error, data, refetch } = useQuery<WeatherForecastResponse>(
-    {
-      queryKey: ["repoData"],
+  const { isPending, error, data } = useQuery<WeatherForecastResponse>({
+      queryKey: ["repoData", place, coords?.lat, coords?.lon],
       queryFn: async () => {
+        const endpoint = coords
+          ? `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`
+          : `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`;
+
         const { data } = await axios.get(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`,
+          endpoint,
         );
         return data;
       },
-    },
-  );
-
-  useEffect(() => {
-    refetch();
-  }, [place, refetch]);
+    });
 
   const firstData = data?.list[0];
   console.log("data", data);
@@ -129,12 +129,7 @@ export default function Home() {
     });
   });
 
-  if (isPending)
-    return (
-      <div className="flex items-center min-h-screen justify-center">
-        <p className="animate-bounce"></p>
-      </div>
-    );
+  if (isPending || loadingCity) return <WeatherSkeleton />;
 
   if (error) return "An error has occurred: " + error.message;
 
@@ -264,3 +259,4 @@ export default function Home() {
     </div>
   );
 }
+
