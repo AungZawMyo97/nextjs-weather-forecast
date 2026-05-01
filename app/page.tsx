@@ -97,21 +97,19 @@ export default function Home() {
   const [loadingCity] = useAtom(loadingCityAtom);
 
   const { isPending, error, data } = useQuery<WeatherForecastResponse>({
-      queryKey: ["repoData", place, coords?.lat, coords?.lon],
-      queryFn: async () => {
-        const endpoint = coords
-          ? `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`
-          : `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`;
+    queryKey: ["repoData", place, coords?.lat, coords?.lon],
+    queryFn: async () => {
+      const endpoint = coords
+        ? `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`
+        : `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`;
 
-        const { data } = await axios.get(
-          endpoint,
-        );
-        return data;
-      },
-    });
+      const { data } = await axios.get(endpoint);
+      return data;
+    },
+  });
 
   const firstData = data?.list[0];
-  console.log("data", data);
+
   const uniqueDates = [
     ...new Set(
       data?.list.map(
@@ -259,4 +257,3 @@ export default function Home() {
     </div>
   );
 }
-

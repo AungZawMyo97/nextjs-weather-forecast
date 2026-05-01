@@ -14,7 +14,7 @@ export default function SearchBox(Props: Props) {
     <form
       onSubmit={Props.onSubmit}
       className={cn(
-        "flex relative items-center justify-center h-10",
+        "flex relative items-center justify-center h-10 w-full",
         Props.className,
       )}
     >
@@ -23,7 +23,7 @@ export default function SearchBox(Props: Props) {
         value={Props.value}
         onChange={Props.onChange}
         placeholder="Search Location..."
-        className="px-4 py-2 w-57.5 border border-gray-300 rounded-l-md focus:outline-none focus:border-blue-500 h-full"
+        className="px-4 py-2 w-full sm:w-72 border border-gray-300 rounded-l-md focus:outline-none focus:border-blue-500 h-full"
       />
       <button className="px-4 py-2.25 bg-blue-500 text-white rounded-r-md focus:outline-none hover:bg-blue-600 h-full">
         <IoSearch />
